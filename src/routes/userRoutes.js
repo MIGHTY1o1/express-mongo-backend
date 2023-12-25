@@ -2,8 +2,8 @@
 const express = require("express");
 const userController = require("../controllers/userController");
 const { verifyUserToken } = require("../middleware/userMiddleware");
-const authMiddleware = require("../middleware/authMiddleware");
-const userMiddleware = require("../middleware/userMiddleware");
+const authMiddleware = require("../middleware/authMiddleware"); // Make sure this line is present
+const userMiddleware = require("../middleware/userMiddleware"); // Make sure this line is present
 
 const router = express.Router();
 

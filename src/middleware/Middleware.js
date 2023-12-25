@@ -29,7 +29,7 @@ function authenticateUser(req, res, next) {
     return res.status(401).json({ message: "Authorization header is missing" });
   }
 
-  const token = authHeader;
+  const token = authHeader; // Use the entire value as the token
   ////  console.log("Token:", token); // Log the token value
 
   try {

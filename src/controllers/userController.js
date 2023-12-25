@@ -9,12 +9,6 @@ const UserModel = require("../models/userModel");
 const uri =
   "mongodb+srv://shubhagarwal1:5KDYVFUgBzjYyTBO@nervesparkcluster.q6cmton.mongodb.net/?retryWrites=true&w=majority";
 
-//retrieve db
-const client = new MongoClient(uri);
-await client.connect();
-
-const db = client.db("test");
-
 //================================================================
 //(base) shubh@shubhs-MacBook-Air nerve_sparcks_backend %
 //curl -X POST -H "Content-Type: application/json" -d '{"user_email": "Tina_Beahan@yahoo.com", "password": "kNqjrASlNxg1ct7"}' http://localhost:8000/user/login
@@ -24,7 +18,12 @@ async function login(req, res) {
     const { user_email, password } = req.body;
 
     console.log("Received credentials:", user_email, password);
+    // console.log("req", req);
 
+    const client = new MongoClient(uri);
+    await client.connect();
+
+    const db = client.db("test");
     const userCollection = await db.collection("user");
 
     const user = await userCollection.findOne({
@@ -34,20 +33,22 @@ async function login(req, res) {
     console.log(user);
 
     if (user) {
+      // Compare the hashed password
       const passwordHash = user.password_hash;
       console.log(passwordHash);
       if (password == passwordHash) {
         console.log("step4");
-
+        // User found, generate token and send it in the response
         const token = authService.generateToken({ user_email });
         res.json({ token });
       }
     } else {
       console.log("step45");
-
+      // User not found or invalid credentials
       res.status(401).json({ message: "Invalid credentials" });
     }
   } catch (error) {
+    // Handle database query error
     console.error("Error during user authentication:", error);
     res.status(500).json({ message: "Internal server error" });
   } finally {
@@ -59,17 +60,22 @@ async function login(req, res) {
 //================================================================
 function protectedRoute(req, res) {
   try {
+    // console.log("hi");
+    // Assuming req.user is set by your authentication middleware
     if (!req.user) {
       return res
         .status(401)
         .json({ message: "Unauthorized: User not authenticated" });
     }
 
+    // Your additional logic here, e.g., checking for token validity
     const token = req.headers.authorization;
-    authService.verifyToken(token, res);
-
+    authService.verifyToken(token, res); // This will throw an error if the token is invalidated
+    // console.log("hi");
+    // If the token is valid, proceed with your response
     res.json({ message: "User route, token verified", user: req.user });
   } catch (error) {
+    // Handle the case where the token is invalidated or any other error
     res
       .status(401)
       .json({ message: "Unauthorized: Invalid token", error: error.message });
@@ -80,6 +86,7 @@ function protectedRoute(req, res) {
 //================================================================
 async function logout(req, res) {
   try {
+    // console.log("step1");
     const token = req.headers.authorization;
     authService.invalidateToken(token);
     res.json({ message: "Logout successful" });
@@ -99,19 +106,28 @@ async function changePassword(req, res) {
   console.log("recieved pass:" + new_password);
 
   try {
+    // Step 2: Find the user record in the database using the username extracted from the token
+    const client = new MongoClient(uri);
+    await client.connect();
+
+    const db = client.db("test");
     const userCollection = await db.collection("user");
 
     const user = await userCollection.findOne({ user_email: username });
+
+    //console.log(allUsers);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Step 3: Update the user's password in the database
     const filter = { user_email: user.user_email };
     const update = { $set: { password_hash: new_password } };
 
     const result = await userCollection.updateOne(filter, update);
 
+    // Step 4: Return a response indicating that the password has been changed successfully
     if (result.modifiedCount === 1) {
       res.json({ message: "Password changed successfully" });
     } else {
@@ -130,6 +146,10 @@ async function changePassword(req, res) {
 //curl -X G//ET -H "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2VtYWlsIjoiVGluYV9CZWFoYW5AeWFob28uY29tIiwiaWF0IjoxNzAzNDM3NDQ3LCJleHAiOjE3MDM0NDEwNDd9.J8VfmkZYFUQyF2b5hXKi0T6rdVGNLHISpCuZSYcIkzQ" -H "Content-Type: application/json" http://localhost:8000/user//viewAllCars/3433fe05-d2b6-4a09-b70b-a7134379d4ca
 async function viewAllCars(req, res) {
   try {
+    const client = new MongoClient(uri);
+    await client.connect();
+
+    const db = client.db("test");
     const userCollection = await db.collection("user");
 
     const userId = req.params.userId;
@@ -155,9 +175,14 @@ async function viewAllCars(req, res) {
 //curl -X GET -H "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2VtYWlsIjoiVGluYV9CZWFoYW5AeWFob28uY29tIiwiaWF0IjoxNzAzNDM3NDQ3LCJleHAiOjE3MDM0NDEwNDd9.J8VfmkZYFUQyF2b5hXKi0T6rdVGNLHISpCuZSYcIkzQ" -H "Content-Type: application/json" http://localhost:8000/user/viewdealonCars/6588600ac85427b0085294d8
 async function viewDealsonCars(req, res) {
   try {
+    const client = new MongoClient(uri);
+    await client.connect();
+
+    const db = client.db("test");
     const dealCollection = await db.collection("deal");
 
     const carId = req.params.carId;
+    console.log(carId);
     const deal = await dealCollection.findOne({ car_id: carId });
 
     if (deal) {
@@ -185,11 +210,18 @@ async function buyCarAfterDeal(req, res) {
   console.log(userEmail);
   console.log("Car ID:", carId);
   try {
+    const client = new MongoClient(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    await client.connect();
+
+    const db = client.db("test");
     const userCollection = await db.collection("user");
     const dealCollection = await db.collection("deal");
 
     const user = await userCollection.findOne({ user_email: userEmail });
-    const deal = await dealCollection.findOne({ car_id: carId });
+    const deal = await dealCollection.findOne({ car_id: carId }); // Corrected variable name to carId
 
     if (!deal) {
       return res.status(404).json({ message: "Deal not found" });

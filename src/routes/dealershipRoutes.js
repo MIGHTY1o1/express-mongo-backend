@@ -2,7 +2,7 @@
 const express = require("express");
 const dealerController = require("../controllers/dealershipController");
 const { verifyDealerToken } = require("../middleware/dealershipMiddleware");
-const dealershipMiddleware = require("../middleware/dealershipMiddleware");
+const dealershipMiddleware = require("../middleware/dealershipMiddleware"); // Make sure this line is present
 
 const router = express.Router();
 
