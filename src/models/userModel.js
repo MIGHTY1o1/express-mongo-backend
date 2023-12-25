@@ -20,11 +20,11 @@ class User {
     this.vehicle_info = this.generateVehicleInfo();
   }
   generateVehicleInfo() {
-    const numVehicles = faker.random.number({ min: 1, max: 5 }); // Adjust as needed
+    const numVehicles = faker.random.number({ min: 1, max: 5 });
     const vehicleIds = [];
 
     for (let i = 0; i < numVehicles; i++) {
-      const vehicleId = faker.random.uuid(); // Assuming you're generating UUIDs for vehicles
+      const vehicleId = faker.random.uuid();
       vehicleIds.push(vehicleId);
     }
 

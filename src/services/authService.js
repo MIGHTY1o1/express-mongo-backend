@@ -2,7 +2,7 @@
 const faker = require("faker");
 const jwt = require("jsonwebtoken");
 
-const secretKey = "shubh"; // replace with a strong secret key
+const secretKey = "shubh";
 
 // Array to store invalidated tokens
 const invalidatedTokens = [];
