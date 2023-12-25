@@ -1,6 +1,7 @@
 // src/models/userModel.js
 const { ObjectId } = require("mongodb");
-
+const client = require("../db");
+const faker = require("faker");
 class User {
   constructor(
     user_email,
@@ -16,7 +17,18 @@ class User {
     this.user_location = user_location;
     this.user_info = user_info;
     this.password_hash = password_hash;
-    this.vehicle_info = vehicle_info || [];
+    this.vehicle_info = this.generateVehicleInfo();
+  }
+  generateVehicleInfo() {
+    const numVehicles = faker.random.number({ min: 1, max: 5 }); // Adjust as needed
+    const vehicleIds = [];
+
+    for (let i = 0; i < numVehicles; i++) {
+      const vehicleId = faker.random.uuid(); // Assuming you're generating UUIDs for vehicles
+      vehicleIds.push(vehicleId);
+    }
+
+    return vehicleIds;
   }
 }
 

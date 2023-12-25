@@ -14,7 +14,7 @@ async function initializeDatabase() {
 
     const database = client.db(dbName);
 
-    // Drop existing collections to delete the current data
+    //Drop existing collections to delete the current data
     await Promise.all([
       database.collection("admin").drop(),
       database.collection("user").drop(),
@@ -31,64 +31,121 @@ async function initializeDatabase() {
     const dealCollection = database.collection("deal");
     const carCollection = database.collection("cars");
     const soldVehicleCollection = database.collection("sold_vehicles");
+    const faker = require("faker");
 
-    // Insert original admin
-    const originalAdmin = new Admin("admin@example.com", "admin_password");
+    const originalAdmin = new Admin(
+      faker.internet.email(),
+      faker.internet.password()
+    );
     await adminCollection.insertOne(originalAdmin);
 
-    // Insert original user
+    // Example of creating a user with vehicle_info
     const originalUser = new User(
-      "user@example.com",
-      "user_id",
-      "user_location",
-      { name: "John Doe", age: 25, gender: "Male" },
-      "user_password"
+      faker.internet.email(),
+      faker.random.uuid(),
+      faker.address.city(),
+      {
+        name: faker.name.findName(),
+        age: faker.random.number({ min: 18, max: 99 }),
+        gender: faker.random.arrayElement(["Male", "Female"]),
+      },
+      faker.internet.password()
     );
     await userCollection.insertOne(originalUser);
 
-    // Insert original dealership
-    const originalDealership = new Dealership(
-      "dealership@example.com",
-      "dealership_id",
-      "Awesome Dealership",
-      "City Center",
-      "dealership_password",
-      { about: "We sell top-notch cars", establishedYear: 2010 },
-      [],
-      [],
-      []
-    );
-    await dealershipCollection.insertOne(originalDealership);
+    //
+    function getRandomNumber(min, max) {
+      return faker.random.number({ min, max });
+    }
 
-    // Insert original list of cars (at least 3)
+    // Function to generate a random sentence
+    function getRandomSentence() {
+      return faker.lorem.sentence();
+    }
+
+    // Function to generate a random email
+    function getRandomEmail() {
+      return faker.internet.email();
+    }
+
+    // Function to generate a random UUID
+    function getRandomUUID() {
+      return faker.random.uuid();
+    }
+
+    // Function to generate a random company name
+    function getRandomCompanyName() {
+      return faker.company.companyName();
+    }
+
+    // Function to generate a random street name
+    function getRandomStreetName() {
+      return faker.address.streetName();
+    }
+
+    // Function to generate a random password
+    function getRandomPassword() {
+      return faker.internet.password();
+    }
+
+    // Function to generate a random year between 1980 and 2022
+    function getRandomEstablishedYear() {
+      return getRandomNumber(1980, 2022);
+    }
+
+    // Create a Dealership instance with faker.js data
+    const carIds = Array.from({ length: 5 }, () => getRandomUUID());
+    const deals = Array.from({ length: 5 }, () => getRandomUUID());
+    const sold = Array.from({ length: 5 }, () => getRandomUUID());
+
+    const originalDealership = new Dealership(
+      getRandomEmail(),
+      getRandomUUID(),
+      getRandomCompanyName(),
+      getRandomStreetName(),
+      getRandomPassword(),
+      {
+        about: getRandomSentence(),
+        establishedYear: getRandomEstablishedYear(),
+      },
+      carIds,
+      deals,
+      sold
+    );
+
+    await dealershipCollection.insertOne(originalDealership);
+    //============================================================
+
     const cars = [
-      new Car("car_id_1", "sedan", "Luxury Sedan", "2022", {
-        color: "Black",
-        mileage: 30,
-      }),
-      new Car("car_id_2", "suv", "Sport Utility Vehicle", "2022", {
-        color: "Blue",
-        mileage: 25,
-      }),
-      new Car("car_id_3", "hatchback", "Compact Hatchback", "2022", {
-        color: "Red",
-        mileage: 28,
-      }),
+      new Car(
+        faker.random.uuid(),
+        faker.random.word(),
+        faker.lorem.words(2),
+        faker.random.number({ min: 2000, max: 2022 }),
+        {
+          color: faker.commerce.color(),
+          mileage: faker.random.number({ min: 10, max: 50 }),
+        }
+      ),
     ];
     await carCollection.insertMany(cars);
 
     // Insert original deal
-    const originalDeal = new Deal("deal_id", cars[0]._id, {
-      price: 45000,
-      discount: 5000,
+    const originalDeal = new Deal(faker.random.uuid(), cars[0]._id, {
+      price: faker.random.number({ min: 30000, max: 80000 }),
+      discount: faker.random.number({ min: 1000, max: 5000 }),
     });
     await dealCollection.insertOne(originalDeal);
 
     // Insert original sold vehicle and link it to the original deal
-    const originalSoldVehicle = new SoldVehicle("vehicle_id", cars[0]._id, {
-      buyerName: "Alice",
-      saleDate: new Date(),
-    });
+    const originalSoldVehicle = new SoldVehicle(
+      faker.random.uuid(),
+      cars[0]._id,
+      {
+        buyerName: faker.name.findName(),
+        saleDate: faker.date.past(),
+      }
+    );
     await soldVehicleCollection.insertOne(originalSoldVehicle);
 
     console.log("Database initialized with original data.");

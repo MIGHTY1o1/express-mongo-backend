@@ -1,0 +1,120 @@
+Nerve Sparks Backend API Documentation
+Base URL: http://localhost:8000
+
+
+----------User Endpoints----------
+
+//User Login
+Route: POST /user/login
+Purpose: Allows a user to log in and obtain an authentication token.
+
+//Protected Route
+Route: GET /user/protected
+Middleware: verifyUserToken
+Purpose: Accesses a protected route, requiring a valid user authentication token.
+
+//User Logout
+Route: POST /user/logout
+Middleware: authMiddleware.authenticateUser
+Purpose: Logs out the authenticated user.
+
+//Change Password
+Route: POST /user/change-password/:username
+Middleware: authMiddleware.authenticateUser
+Purpose: Allows the authenticated user to change their password.
+
+//View All Cars for a User
+Route: GET /user/viewAllCars/:userId
+Middleware: authMiddleware.authenticateUser
+Purpose: Retrieves a list of all cars associated with a specific user.
+
+//View Deals on a Specific Car
+Route: GET /user/viewdealonCars/:carId
+Middleware: authMiddleware.authenticateUser
+Purpose: Retrieves deals related to a specific car.
+
+//Buy a Car After a Deal
+Route: POST /user/buy-car-after-deal/:carId
+Middleware: authMiddleware.authenticateUser
+Purpose: Allows the user to buy a car after a deal has been made.
+
+
+----------Dealer Endpoints----------
+
+//Dealer Login
+Route: POST /dealer/login
+Purpose: Allows a dealership to log in and obtain an authentication token.
+
+//Protected Route
+Route: GET /dealer/protected
+Middleware: verifyDealerToken
+Purpose: Accesses a protected route, requiring a valid dealership authentication token.
+
+//Dealer Logout
+Route: POST /dealer/logout
+Middleware: dealershipMiddleware.authenticateUser
+Purpose: Logs out the authenticated dealership.
+
+//Change Password
+Route: POST /dealer/change-password/:username
+Middleware: dealershipMiddleware.authenticateUser
+Purpose: Allows the authenticated dealership to change their password.
+
+//View All Cars in a Dealership
+Route: GET /dealer/getcars/:dealerId
+Middleware: dealershipMiddleware.authenticateUser
+Purpose: Retrieves a list of all cars associated with a specific dealership.
+
+//View Dealerships with a Certain Car
+Route: GET /dealer/dealerships/bycar/:carId
+Middleware: dealershipMiddleware.authenticateUser
+Purpose: Retrieves dealerships associated with a specific car.
+
+//View All Sold Cars
+Route: GET /dealer/soldcars/:dealership_email
+Middleware: dealershipMiddleware.authenticateUser
+Purpose: Retrieves a list of all cars sold by a specific dealership.
+
+//Add Cars to Dealership
+Route: POST /dealer/addcars/:carID
+Middleware: dealershipMiddleware.authenticateUser
+Purpose: Adds cars to the inventory of the authenticated dealership.
+
+//View All Deals
+Route: GET /dealer/alldeals
+Middleware: dealershipMiddleware.authenticateUser
+Purpose: Retrieves a list of all deals associated with the authenticated dealership.
+
+//Add New Deal
+Route: POST /dealer/addDeal/:dealID
+Middleware: dealershipMiddleware.authenticateUser
+Purpose: Adds a new deal to the authenticated dealership's deals.
+
+
+-------------Admin Endpoints-------
+
+//Admin Login
+Route: POST /admin/login
+Purpose: Allows an admin to log in and obtain an authentication token.
+
+//Get All Admins
+Route: GET /admin/getadmin
+Purpose: Retrieves information about all admin users from the database.
+
+//Protected Route
+Route: GET /admin/protected
+Middleware: verifyAdminToken
+Purpose: Accesses a protected route, requiring a valid admin authentication token.
+
+//Admin Logout
+Route: POST /admin/logout
+Middleware: adminMiddleware.authenticateUser
+Purpose: Logs out the authenticated admin.
+
+//Change Password
+Route: POST /admin/change-password/:username
+Middleware: adminMiddleware.authenticateUser
+Purpose: Allows the authenticated admin to change their password.
+
+
+

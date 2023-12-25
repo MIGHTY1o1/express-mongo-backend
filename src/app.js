@@ -1,8 +1,11 @@
-// src/app.js
+//================================================================================
+//src / app.js;
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const { MongoClient } = require("mongodb");
+const adminRoutes = require("./routes/adminRoutes");
+const userRoutes = require("./routes/userRoutes"); // Import user routes
+const dealerRoutes = require("./routes/dealershipRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -10,27 +13,17 @@ const PORT = process.env.PORT || 8000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Replace <password> with the actual password for the shubhagarwal1 user
-const MONGODB_URI =
-  "mongodb+srv://shubhagarwal1:5KDYVFUgBzjYyTBO@nervesparkcluster.q6cmton.mongodb.net/?retryWrites=true&w=majority";
+// Admin routes
+app.use("/admin", adminRoutes);
 
-// Create a new MongoClient
-const client = new MongoClient(MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+// user routes
+app.use("/user", userRoutes);
+
+//dealer routes
+app.use("/dealer", dealerRoutes);
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
-// Connect to MongoDB Atlas
-client
-  .connect()
-  .then(() => {
-    console.log("Connected to MongoDB Atlas");
-
-    // Start the Express server
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.error("Error connecting to MongoDB Atlas:", error);
-  });
+//================================================================================
